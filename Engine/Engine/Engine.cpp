@@ -1,10 +1,11 @@
 #include "Engine.h"
 #include <iostream>
-#pragma comment(lib, "winmm.lib")
 #include <Windows.h>
 
 namespace Wanted
 {
+	const int KEY_RANGE = 255;
+
 	Engine::Engine()
 	{
 	}
@@ -55,7 +56,7 @@ namespace Wanted
 				previousTime = currentTime;
 
 				// 현재 입력 값을 이전 입력 값으로 저장
-				for (int i = 0; i < 255; i++)
+				for (int i = 0; i < KEY_RANGE; i++)
 					keyStates[i].wasKeyDown = keyStates[i].isKeyDown;
 			}
 		}
@@ -91,7 +92,7 @@ namespace Wanted
 	{
 		// 키 마다의 입력 읽기.
 		// 운영체제가 제공하는 기능을 사용할 수 밖에 없다.
-		for(int i = 0; i < 255; i++)
+		for(int i = 0; i < KEY_RANGE; i++)
 			keyStates[i].isKeyDown = GetAsyncKeyState(i) & 0x8000;
 	}
 
