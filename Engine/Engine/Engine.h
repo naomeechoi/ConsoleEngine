@@ -1,8 +1,9 @@
 #pragma once
+#include "Common/Common.h"
 
 namespace Wanted
 {
-	class Engine
+	class NAOMI_API Engine
 	{
 		struct KeyState
 		{
@@ -23,8 +24,12 @@ namespace Wanted
 		bool GetKeyUp(int keyConde);
 		bool GetKey(int keyConde);
 
+		// 새 레벨 추가 함수
+		void SetNewLevel(class Level* newLevel);
+
 	private:
 		void ProcessInput();
+		void BeginPlay();
 		void Tick(float deletaTime);
 		void Draw();
 
@@ -33,6 +38,8 @@ namespace Wanted
 		bool isQuit = false;
 
 		KeyState keyStates[255] = { };
+
+		class Level* mainLevel = nullptr;
 	};
 }
 
