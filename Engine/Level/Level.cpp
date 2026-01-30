@@ -47,10 +47,43 @@ namespace Wanted
 			actor->Draw();
 		}
 	}
-	
-	void Level::AddNewActor(Actor* newActor)
+
+	void Level::PostProcess()
 	{
-		// TODO: 나중에 프레임 처리 고려해서 따로 추가 작업 해야함
-		actors.emplace_back(newActor);
+		ProcessAddAndDestroyActors();
+	}
+	
+	void Level::AddNewActor(Actor* const newActor)
+	{
+		// 한 프레임 끝나기 전에 추가가되는 것을 방지 하기 위해 임시 배열에 저장
+		addRequestedActors.emplace_back(newActor);
+		newActor->SetOwner(this);
+	}
+
+	void Level::ProcessAddAndDestroyActors()
+	{
+		// 제거 처리
+		for (auto iter = actors.begin(); iter != actors.end();)
+		{
+			if ((*iter)->DestroyRequested())
+			{
+				delete *iter;
+				iter = actors.erase(iter);
+			}
+			else
+			{
+				iter++;
+			}
+		}
+
+		// 추가 처리
+		if (addRequestedActors.empty())
+			return;
+
+		for (Actor* const requestedActor : addRequestedActors)
+		{
+			actors.emplace_back(requestedActor);
+		}
+		addRequestedActors.clear();
 	}
 }

@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Level/Level.h"
 #include "Core/Input.h"
+#include "Util/Util.h"
 
 #include <iostream>
 #include <Windows.h>
@@ -19,6 +20,9 @@ namespace Wanted
 		// 데이터 영역에 input을 가르키는 주소가 저장되는 것!!
 
 		LoadSetting();
+
+		// 커서 끄기
+		Util::SetCursorVisible(false);
 	}
 
 	Engine::~Engine()
@@ -78,12 +82,12 @@ namespace Wanted
 
 				previousTime = currentTime;
 				input->SavePreviousInputStates();
+
+				PostProcess();
 			}
 		}
 
-
-		std::cout << "Engine has been shutdown...\n";
-		// TODO: 정리 작업
+		Shutdown();
 	}
 
 	void Engine::QuitEngine()
@@ -112,6 +116,14 @@ namespace Wanted
 		}
 
 		return *instance;
+	}
+
+	void Engine::Shutdown()
+	{
+		std::cout << "Engine has been shutdown...\n";
+
+		// 커서 키기
+		Util::SetCursorVisible(true);
 	}
 
 	void Engine::LoadSetting()
@@ -172,5 +184,24 @@ namespace Wanted
 		}
 
 		mainLevel->Draw();
+	}
+
+	void Engine::PostProcess()
+	{
+		if (!mainLevel)
+		{
+			std::cout << "Error: Engine::Draw(). mainLevel is empty.\n";
+			return;
+		}
+		
+		mainLevel->PostProcess();
+	}
+
+	void Engine::SetCursor(bool bOn)
+	{
+		CONSOLE_CURSOR_INFO info = {};
+		GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+		info.bVisible = bOn;
+		SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 	}
 }

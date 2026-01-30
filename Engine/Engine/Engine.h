@@ -26,12 +26,19 @@ namespace Wanted
 		static Engine& Get();
 
 	private:
+		// 정리 함수
+		void Shutdown();
+
 		// 설정 파일 로드 함수
 		void LoadSetting();
 
 		void BeginPlay();
 		void Tick(float deletaTime);
 		void Draw();
+		void PostProcess();
+
+	private:
+		void SetCursor(bool bOn);
 
 	private:
 		// 엔진 종료 플래그.

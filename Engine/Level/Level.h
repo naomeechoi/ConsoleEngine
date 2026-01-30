@@ -17,13 +17,18 @@ namespace Wanted
 		virtual void BeginPlay();
 		virtual void Tick(float deletaTime);
 		virtual void Draw();
+		virtual void PostProcess();
 
-		void AddNewActor(Actor* newActor);
+		void AddNewActor(Actor* const newActor);
 
+		// 액터 추가/제거 처리 함수
+		void ProcessAddAndDestroyActors();
 	protected:
 		std::vector<Actor*> actors;
 		// dll 쓸때는 템플릿 사용하면 안된다.
 		// 그래서 #pragma warning(disable: 4251) 이걸 써줘서 오류가 뜨지 않게 한다.
+
+		std::vector<Actor*> addRequestedActors;
 	};
 }
 
