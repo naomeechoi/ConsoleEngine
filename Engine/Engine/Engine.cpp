@@ -163,9 +163,6 @@ namespace Wanted
 			<< std::endl;
 		*/
 
-		if (input->GetKeyDown(VK_ESCAPE))
-			QuitEngine();
-
 		if (!mainLevel)
 		{
 			std::cout << "Error: Engine::Tick(). mainLevel is empty.\n";
