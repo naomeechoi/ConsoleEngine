@@ -2,9 +2,11 @@
 #include "Level/Level.h"
 #include "Core/Input.h"
 #include "Util/Util.h"
+#include "Render/Renderer.h"
 
 #include <iostream>
 #include <Windows.h>
+#include <fstream>
 
 namespace Wanted
 {
@@ -20,6 +22,8 @@ namespace Wanted
 		// 데이터 영역에 input을 가르키는 주소가 저장되는 것!!
 
 		LoadSetting();
+
+		renderer = new Renderer(Vector2(setting.width, setting.height));
 
 		// 커서 끄기
 		Util::SetCursorVisible(false);
@@ -38,6 +42,8 @@ namespace Wanted
 			delete input;
 			input = nullptr;
 		}
+
+		SafeDelete(renderer);
 	}
 
 	void Engine::Run()
@@ -128,21 +134,49 @@ namespace Wanted
 
 	void Engine::LoadSetting()
 	{
-		FILE* file = nullptr;
-		fopen_s(&file, "../Config/Setting.txt", "rt");
-		if (!file)
+		std::ifstream file("../Config/Setting.txt");
+		if (!file.is_open())
 		{
 			std::cout << "Fail to open engine setting file." << std::endl;
 			__debugbreak();
 			return;
 		}
 
-		char buffer[2048] = {};
-		size_t readSize = fread(buffer, sizeof(char), 2048, file);
+		std::string line;
+		while (std::getline(file, line))
+		{
+			// 줄 앞뒤 공백 제거
+			line = trim(line);
 
-		sscanf_s(buffer, "framerate = %f", &setting.framerate);
+			// '=' 위치 찾기
+			size_t equalPos = line.find('=');
+			if (equalPos != std::string::npos)
+			{
+				std::string key = line.substr(0, equalPos);     // '=' 앞부분 (key)
+				std::string value = line.substr(equalPos + 1);  // '=' 뒷부분 (value)
 
-		fclose(file);
+				key = trim(key);
+				value = trim(value);
+
+				// 설정 값 파싱
+				if (key == "framerate")
+					sscanf_s(value.c_str(), "%f", &setting.framerate);
+				else if (key == "width")
+					sscanf_s(value.c_str(), "%d", &setting.width);
+				else if (key == "height")
+					sscanf_s(value.c_str(), "%d", &setting.height);
+			}
+		}
+
+		file.close();
+	}
+
+	std::string Engine::trim(const std::string& str)
+	{
+		size_t start = str.find_first_not_of(" \t");
+		size_t end = str.find_last_not_of(" \t");
+
+		return (start == std::string::npos || end == std::string::npos) ? "" : str.substr(start, end - start + 1);
 	}
 
 	void Engine::BeginPlay()
@@ -181,6 +215,7 @@ namespace Wanted
 		}
 
 		mainLevel->Draw();
+		renderer->Draw();
 	}
 
 	void Engine::PostProcess()

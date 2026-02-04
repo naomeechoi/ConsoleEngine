@@ -78,7 +78,60 @@ namespace Wanted
 
 	void Renderer::Draw()
 	{
+		// 화면 지우기
+		Clear();
 
+		// 전제조건: 레벨의 모든 액터가 렌더러에 Submit을 완료
+		// 렌더큐 순회하면서 프레임 채우기
+		for (const RenderCommand& command : renderQueue)
+		{
+			if (!command.text)
+				continue;
+
+			if (command.position.y < 0 || command.position.y >= screenSize.y)
+				continue;
+
+			const int length = static_cast<int>(strlen(command.text));
+			if (length <= 0)
+				continue;
+
+			const int startX = command.position.x;
+			const int endX = command.position.x + length - 1;
+
+			if (endX < 0 || startX >= screenSize.x)
+			{
+				continue;
+			}
+
+			// 시작 위치
+			const int visibleStart = startX < 0 ? 0 : startX;
+			const int visibleEnd = endX >= screenSize.x ? screenSize.x - 1 : endX;
+
+			for (int x = visibleStart; x <= visibleEnd; x++)
+			{
+				// 문자열 안에 문자 인덱스
+				const int sourceIndex = x - startX;
+
+				// 프레임에서 인덱스
+				const int index = (command.position.y * screenSize.x) + x;
+
+				if (frame->sortingOrderArray[index] > command.sortingOrder)
+					continue;
+
+				frame->charInfoArray[index].Char.AsciiChar = command.text[sourceIndex];
+				frame->charInfoArray[index].Attributes = (WORD)command.color;
+				frame->sortingOrderArray[index] = command.sortingOrder;
+			}
+		}
+
+		// 그리기
+		GetCurScreenBuffer()->Draw(frame->charInfoArray);
+		
+		// 버퍼 교환
+		Present();
+
+		// 렌더큐 비우기
+		renderQueue.clear();
 	}
 
 	void Renderer::Submit(
@@ -87,19 +140,29 @@ namespace Wanted
 		Color color,
 		int sortingOrder)
 	{
+		RenderCommand command = {};
+		command.text = text;
+		command.position = position;
+		command.color = color;
+		command.sortingOrder = sortingOrder;
+		renderQueue.emplace_back(command);
 	}
 
 	void Renderer::Clear()
 	{
-
+		frame->Clear(screenSize);
+		GetCurScreenBuffer()->Clear();
 	}
 
 	void Renderer::Present()
 	{
+		// 버퍼 교환
+		SetConsoleActiveScreenBuffer(GetCurScreenBuffer()->GetBuffer());
+		curBufferIdx = 1 - curBufferIdx;
 	}
 
 	ScreenBuffer* Renderer::GetCurScreenBuffer()
 	{
-		return nullptr;
+		return screenBuffers[curBufferIdx];
 	}
 }

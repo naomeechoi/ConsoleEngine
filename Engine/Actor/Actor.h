@@ -12,7 +12,7 @@ namespace Wanted
 		// RTTI 코드 추가
 		RTTI_DECLARATIONS(Actor, RTTI)
 	public:
-		Actor(const char image = ' ', const Vector2& position = Vector2::Zero, Color color = Color::White);
+		Actor(const char* image = " ", const Vector2& position = Vector2::Zero, Color color = Color::White);
 		virtual ~Actor();
 
 		virtual void BeginPlay();
@@ -38,7 +38,7 @@ namespace Wanted
 		bool isActive = true;
 		bool destroyRequested = false;
 
-		char image = ' ';
+		char* image = nullptr;
 
 		Color color = Color::White;
 

@@ -7,13 +7,17 @@
 
 namespace Wanted
 {
-	Actor::Actor(const char image, const Vector2& position, Color color)
-		:image(image), position(position), color(color)
+	Actor::Actor(const char* image, const Vector2& position, Color color)
+		:position(position), color(color)
 	{
+		size_t len = strlen(image) + 1;
+		this->image = new char[len];
+		strcpy_s(this->image, len, image);
 	}
 
 	Actor::~Actor()
 	{
+		SafeDeleteArray(image);
 	}
 
 	void Actor::BeginPlay()
@@ -28,12 +32,15 @@ namespace Wanted
 
 	void Actor::Draw()
 	{
-		Renderer::Draw(position, color, image);
+		// 렌더러에 데이터 제출
+		Renderer::Get().Submit(image, position, color, sortingOrder);
 	}
 
 	void Actor::SetPosition(const Vector2& newPosition)
 	{
-		Renderer::Draw(position, ' ');
+		if (position == newPosition)
+			return;
+
 		position = newPosition;
 	}
 }

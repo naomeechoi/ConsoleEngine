@@ -2,6 +2,7 @@
 #include "Game/Game.h"
 #include "Core/Input.h"
 #include "Util/Util.h"
+#include "Render/Renderer.h"
 #include <iostream>
 
 MenuLevel::MenuLevel()
@@ -47,14 +48,14 @@ void MenuLevel::Tick(float deltaTime)
 
 void MenuLevel::Draw()
 {
-	Util::SetConsolePosition(Vector2::Zero);
-	Util::SetConsoleTextColor(Color::White);
+	Renderer::Get().Submit("Sokoban Game", Vector2::Zero);
 
-	std::cout << "Sokoban Game\n\n";
 	for (int i = 0; i < items.size(); i++)
 	{
 		Color textColor = i == currentIndex ? selectedColor : unselectedColor;
-		Util::SetConsoleTextColor(textColor);
-		std::cout << items[i]->text << std::endl;
+
+		Renderer::Get().Submit(items[i]->text, Vector2(0, 2 + 1), textColor);
+		/*Util::SetConsoleTextColor(textColor);
+		std::cout << items[i]->text << std::endl;*/
 	}
 }

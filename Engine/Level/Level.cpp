@@ -44,20 +44,7 @@ namespace Wanted
 	{
 		for (Actor* actor : actors)
 		{
-			Actor* zUpActor = nullptr;
-			for (Actor* otherActor : actors)
-			{
-				if (actor == otherActor)
-					continue;
-
-				if (actor->GetPosition() == otherActor->GetPosition())
-				{
-					if (actor->GetSortingOrder() < otherActor->GetSortingOrder())
-						zUpActor = otherActor;
-				}
-			}
-
-			if (zUpActor)
+			if (!actor->IsActive())
 				continue;
 
 			actor->Draw();

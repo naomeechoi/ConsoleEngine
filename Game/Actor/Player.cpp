@@ -12,7 +12,7 @@
 #include <Windows.h>
 
 Player::Player(const Vector2& position)
-	: super('P', position, Color::Yellow)
+	: super("P", position, Color::Yellow)
 {
 	sortingOrder = 10;
 }
